@@ -40,14 +40,9 @@ const userSchema = mongoose.Schema(
       },
       role:{
         type:String,
-        required:true,
-        default:PASSENGER
-      },
-      isAdmin: {
-        type: Boolean,
-        required: true,
-        default: false,
-      },
+        enum:["admin","passenger","owner","driver","supervisor"],
+        default:"passenger"
+      }
     },
     {
       timestamps: true,

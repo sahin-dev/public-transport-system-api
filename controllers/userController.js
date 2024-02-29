@@ -16,7 +16,17 @@ const loginUser = async(req,res,next)=>{
     const user = await User.findOne({email});
 
     if(user && user.matchPassword(password)){
-        res.json({id:user._id,name:user.name,email:user.email,token:generateToken(user._id)});
+        res.json(
+            {
+                id:user._id,
+                name:user.name,
+                email:user.email,
+                occupation:user.occupation,
+                role:user.role,
+                phone:user.phone,
+                nid:user.nid,
+                dob:user.dob,
+                token:generateToken(user._id)});
     }else{
         next(createError(401,"Invalid email or password"));
     }
@@ -27,7 +37,7 @@ const loginUser = async(req,res,next)=>{
 // @route POST /api/users
 // @access Public
 const registerUser = async(req,res,next)=>{
-    const {name,email,phone,password,nid,dob, occupation} = req.body;
+    const {name,email,phone,password,nid,dob, occupation,role} = req.body;
 
     const existUser = await User.findOne({email});
     const phoneUsed = await User.findOne({phone});
@@ -36,7 +46,13 @@ const registerUser = async(req,res,next)=>{
         next(createError(409, `User already exist with same email or phone`));
         return;
     }
-    const user = await User.create({name,email,phone,password,nid,birth_date:Date(dob), occupation});
-    res.json(user);
+    try{
+        const user = await User.create({name,email,phone,password,nid,birth_date:Date(dob), occupation,role});
+        res.json(user);
+    }
+    catch(err){
+        res.status(500).json({msg:"User creation failed!"});
+    }
+   
 }
 module.exports = {getUser,loginUser,registerUser};
