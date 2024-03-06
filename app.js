@@ -9,6 +9,7 @@ const routeRouter = require('./routes/routeRouter');
 const passengerRouter = require('./routes/passengerRouter');
 const ownerRouter =require('./routes/ownerRouter');
 const adminRouter = require('./routes/adminRouter');
+const paymentRouter = require('./routes/paymentRouter')
 const connectDb = require('./config/db');
 const dotenv = require('dotenv');
 
@@ -38,6 +39,7 @@ app.use('/api/routes',routeRouter);
 app.use('/api/passengers',passengerRouter);
 app.use('/api/user/owner',ownerRouter);
 app.use('/api/admin',adminRouter);
+app.use('/api/payment',paymentRouter);
 app.use('/', indexRouter);
 
 

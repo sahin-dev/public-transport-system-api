@@ -31,8 +31,9 @@ const userSchema = mongoose.Schema(
         required:true
       },
       wallet:{
-        type:Object,
-        required:false,
+        type:mongoose.ObjectId,
+        ref:"Wallet",
+        required:true,
       },
       birth_date:{
         type:Date,
@@ -48,6 +49,9 @@ const userSchema = mongoose.Schema(
       timestamps: true,
     }
   )
+
+  // userSchema.path('objectId').get(v=>v.toString());
+
   userSchema.methods.matchPassword =  async function (enteredPassword){
     return  await bcrypt.compare(enteredPassword, this.password);
   }

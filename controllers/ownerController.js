@@ -137,7 +137,7 @@ const addVehicleRequest = async(req,res,next)=>{
         }
         
         const request = await Request.create({user_id:user._id,type:"Vehicle addition request",body:req.body});
-        const vehicle = await Vehicle.create({name,desc,type,number,owner_id:user._id,route});
+        const vehicle = await Vehicle.create({name,desc,type,number,owner:user._id,route});
         
         res.status(200);
         res.json({status:"success",msg:"Request submitted successfully",data:vehicle});
@@ -178,7 +178,7 @@ const removeVehicle = async(req,res,next)=>{
         }
         
         await vehicle.deleteOne({_id:vehicle_id});
-        res.status(200).json({status:"success", msg:"Vehicle deleted successfully", data:vehicle});
+        res.status(200).json({status:"success", msg:"Vehicle deleted successfully"});
         
     }catch(err){
         next(createError(400,"Deleting vehicle failed"));

@@ -2,11 +2,16 @@
 const mongoose = require('mongoose');
 
 const paymentSchema = new mongoose.Schema({
-    trans_id:{
+    user:{
+        type:mongoose.ObjectId,
+        ref:"User",
+        required:true
+    },
+    tran_id:{
         type:String,
         required:true
     },
-    trans_date:{
+    tran_date:{
         type:Date,
         required:true
     },
@@ -14,8 +19,11 @@ const paymentSchema = new mongoose.Schema({
         type:Number,
         required:true
     },
-    trans_method:{
+    card_type:{
         type:String,
         required:true
     }
 })
+
+const Payment = mongoose.model('Payment',paymentSchema)
+module.exports = Payment

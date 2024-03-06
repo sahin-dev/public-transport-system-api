@@ -24,20 +24,23 @@ const vehicleSchema = new mongoose.Schema({
         required:true,
         default:"Pending"
     },
-    owner_id:{
+    owner:{
         type:mongoose.ObjectId,
+        ref:'User',
         required:true,
     },
     route:{
         type:Object,
         required:true,
     },
-    supervisor_id:{
+    supervisor:{
         type:mongoose.ObjectId,
+        ref:'User',
         required:false,
     },
-    driver_id:{
+    driver:{
         type:mongoose.ObjectId,
+        ref:'User',
         required:false,
     },
 },
