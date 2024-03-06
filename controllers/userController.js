@@ -44,8 +44,10 @@ const registerUser = async(req,res,next)=>{
         return;
     }
     try{
-        const user = await User.create({name,email,phone,password,nid,birth_date:Date(dob), occupation,role});
-        res.json(user);
+        const wallet = await Wallet.create();
+        const user = await User.create({name,email,phone,password,nid,birth_date:Date(dob),wallet, occupation,role});
+      
+        res.status(200).json({msg:"User created successfully"});
     }
     catch(err){
         res.status(500).json({msg:"User creation failed!"});

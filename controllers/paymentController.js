@@ -2,6 +2,7 @@
 const SSLCommerzPayment = require('sslcommerz-lts')
 const Payment = require('../models/paymentModel')
 const User = require('../models/userModel')
+const generateId = require('randomstring')
 require('dotenv').config()
 
 const store_id = process.env.STORE_ID
@@ -11,18 +12,20 @@ const port = process.env.PORT
 
 const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live)
 
+const tran_id = generateId.generate({length:8,charset:'hex',capitalization:'uppercase'})
+
 const initPayment = (req,res,next)=>{
     const {amount = 1000,c_name = "Sahin",c_email = 'sahin@gmail.com',c_phone='01621839863'} = req.body
     const data = {
         total_amount: amount,
         currency: 'BDT',
-        tran_id: 'REF123', 
+        tran_id, 
         success_url: `http://localhost:${port}/api/payment/success`,
         fail_url: `http://localhost:${port}/api/payment/fail`,
         cancel_url: `http://localhost:${port}/api/payment/cancel`,
         ipn_url: `http://localhost:${port}/api/payment/ipn`,
-        shipping_method: 'Courier',
-        product_name: 'Computer.',
+        shipping_method: 'online',
+        product_name: 'add_fare.',
         product_category: 'fare',
         product_profile: 'general',
         cus_name: c_name,
@@ -35,7 +38,7 @@ const initPayment = (req,res,next)=>{
         cus_country: 'Bangladesh',
         cus_phone: c_phone,
         cus_fax: '01711111111',
-        ship_name: 'Customer Name',
+        ship_name: c_name,
         ship_add1: 'Dhaka',
         ship_add2: 'Dhaka',
         ship_city: 'Dhaka',
@@ -101,6 +104,7 @@ const IPN = (req,res,next)=>{
 
 //
 const paymentSuccess = async (req,res,next)=>{
+    
     const {val_id} = req.body
 
     const {status,tran_date,tran_id,amount,card_type} = await sslcz.validate({val_id})
