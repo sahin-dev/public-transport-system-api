@@ -17,7 +17,7 @@ const loginUser = async(req,res,next)=>{
     const {email, password} = req.body;
     const user = await User.findOne({email});
 
-    if(user && user.matchPassword(password)){
+    if(user && (await user.matchPassword(password))){
         res.json(
             {
                 id:user._id,
@@ -35,7 +35,7 @@ const loginUser = async(req,res,next)=>{
 // @access Public
 const registerUser = async(req,res,next)=>{
     const {name,email,phone,password,nid,dob, occupation,role} = req.body;
-
+    console.log("Registration called!")
     const existUser = await User.findOne({email});
     const phoneUsed = await User.findOne({phone});
     
@@ -44,7 +44,7 @@ const registerUser = async(req,res,next)=>{
         return;
     }
     try{
-        const wallet = await Wallet.create();
+        const wallet = await Wallet.create({});
         const user = await User.create({name,email,phone,password,nid,birth_date:Date(dob),wallet, occupation,role});
       
         res.status(200).json({msg:"User created successfully"});
