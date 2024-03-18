@@ -92,7 +92,7 @@ const assignSupervisor = async(req,res,next)=>{
 
 const getVehicles = async(req,res,next)=>{
     try{
-        const vehicles = await Vehicle.find({'owner_id':req.user._id});
+        const vehicles = await Vehicle.find({'owner':req.user._id});
         res.status(200);
         res.json({status:"success",msg:"Vehicles fetched successfully",data:vehicles});
     }catch(err){
@@ -109,7 +109,7 @@ const getVehicles = async(req,res,next)=>{
 const getVehicle = async(req,res,next)=>{
     const v_id = req.params.v_id;
     try{
-        const vehicles = await Vehicle.findOne({_id:v_id,'owner_id':req.user._id});
+        const vehicles = await Vehicle.findOne({_id:v_id,'owner':req.user._id});
         res.status(200);
         res.json({status:"success",msg:"Vehicle fetched successfully",data:vehicles});
 
