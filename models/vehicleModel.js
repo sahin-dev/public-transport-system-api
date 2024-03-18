@@ -7,6 +7,10 @@ const vehicleSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
+    uniqueId:{
+        type:String,
+        required:false
+    },
     desc:{
         type:String
     },
@@ -15,14 +19,14 @@ const vehicleSchema = new mongoose.Schema({
         required:true
     },
 
-    number:{
+    number:{  //number structure DHAKA-D-11-9999
         type:String,
         required:true
     },
     status:{
         type:String,
-        required:true,
-        default:"Pending"
+        default:"pending",
+        enum:['pending','active']
     },
     owner:{
         type:mongoose.ObjectId,
@@ -52,12 +56,14 @@ const vehicleSchema = new mongoose.Schema({
 vehicleSchema.methods.getRoute = function(){
     return this.route;
 }
-// vehicleSchema.pre('save',function(next){
-//     if(!this.isModified('name')){
-//         next();
-//     }
-//     this.name = this.name+"-"+this.number;
-// });
+vehicleSchema.pre('save',function(next){
+    if(!this.isModified('number')){
+        next();
+    }
+    let parts = this.number.split('-');
+    this.uniqueId = parts[1]+parts[2]+parts[3];
+    next();
+});
 
 const Vehicle = mongoose.model("Vehicle", vehicleSchema);
 module.exports = Vehicle;

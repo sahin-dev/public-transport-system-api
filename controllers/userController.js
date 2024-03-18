@@ -15,7 +15,7 @@ const getUser =  async(req,res,next)=>{
 // @access  Public
 const loginUser = async(req,res,next)=>{
     const {email, password} = req.body;
-    const user = await User.findOne({email});
+    const user = await User.findOne({email}).populate('wallet',['-user','-_id']);
 
     if(user && (await user.matchPassword(password))){
         res.json(
@@ -24,6 +24,7 @@ const loginUser = async(req,res,next)=>{
                 name:user.name,
                 email:user.email,
                 role:user.role,
+                wallet:user.wallet,
                 token:generateToken(user._id)});
     }else{
         next(createError(401,"Invalid email or password"));
@@ -47,11 +48,12 @@ const registerUser = async(req,res,next)=>{
     try{
         const wallet = await Wallet.create({});
         const user = await User.create({name,email,phone,password,nid,birth_date:Date(dob),wallet, occupation,role});
-      
+        wallet.user = user._id;
+        await wallet.save();
         res.status(200).json({msg:"User created successfully"});
     }
     catch(err){
-        res.status(500).json({msg:"User creation failed!"});
+        res.status(500).json({msg:`User creation failed! : ${err.message}`});
     }
    
 }
@@ -61,7 +63,7 @@ const registerUser = async(req,res,next)=>{
 // @route   GET /api/users/profile
 // @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id)
+    const user = await User.findById(req.user._id).populate('wallet',['-user','-_id'])
   
     if (user) {
       res.json({
@@ -70,6 +72,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
         email: user.email,
         occupation:user.occupation,
         role:user.role,
+        wallet:user.wallet,
         phone:user.phone,
         nid:user.nid,
         dob:user.dob,

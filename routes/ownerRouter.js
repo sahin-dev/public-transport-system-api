@@ -2,10 +2,11 @@ const express = require('express');
 
 const router = express.Router();
 const {assignDriver,assignSupervisor,requestWithdraw,getVehicles,addVehicleRequest, getRequests,
-    editVehicle, removeVehicle, addBank, changeStatus, getDriverDetails, getSupervisorDetails, getVehicle} = require('../controllers/ownerController');
+    editVehicle, removeVehicle, addBank, changeStatus, getDriverDetails, getSupervisorDetails, getVehicle, getVehiclesByStatus} = require('../controllers/ownerController');
 const {protect} = require('../middlewares/authMiddleware')
 
 router.route("/vehicles").get(protect,getVehicles);
+router.route("/vehicles/:status").get(protect,getVehiclesByStatus);
 router.route("/vehicle/:v_id").get(protect, getVehicle).put(protect,editVehicle).delete(protect,removeVehicle);
 router.get("/vehicle/driver/:d_id",protect, getDriverDetails);
 router.get("/vehicle/supervisor/:s_id",protect, getSupervisorDetails);

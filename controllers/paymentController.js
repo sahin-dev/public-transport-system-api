@@ -2,6 +2,7 @@
 const SSLCommerzPayment = require('sslcommerz-lts')
 const Payment = require('../models/paymentModel')
 const User = require('../models/userModel')
+const Wallet = require('../models/walletModel')
 const generateId = require('randomstring')
 require('dotenv').config()
 
@@ -14,6 +15,9 @@ const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live)
 
 const tran_id = generateId.generate({length:8,charset:'hex',capitalization:'uppercase'})
 
+//@desc Initiate Payment
+//@route GET api/payment
+//@access Private
 const initPayment = (req,res,next)=>{
     const {amount = 1000,c_name = "Sahin",c_email = 'sahin@gmail.com',c_phone='01621839863'} = req.body
     const data = {
@@ -49,7 +53,6 @@ const initPayment = (req,res,next)=>{
 
     sslcz.init(data).then(apiResponse => {
         // Redirect the user to payment gateway
-        console.log(apiResponse)
         let GatewayPageURL = apiResponse.GatewayPageURL
         res.redirect(GatewayPageURL)
         console.log('Redirecting to: ', GatewayPageURL)
@@ -106,15 +109,22 @@ const IPN = (req,res,next)=>{
 const paymentSuccess = async (req,res,next)=>{
     
     const {val_id} = req.body
+    try{
+        const {status,tran_date,tran_id,amount,card_type} = await sslcz.validate({val_id})
 
-    const {status,tran_date,tran_id,amount,card_type} = await sslcz.validate({val_id})
-
-    await Payment.create({user:req.user,tran_id,amount,tran_date,card_type})
-    if(status === 'VALID'){
-        res.json({msg:'Payment Success',amount,tran_id})
-        return
-    }
-    res.status(500).jsno({mag:"Payment Invalid"})
+        if(status === 'VALID'){
+            await Payment.create({user:req.user,tran_id,amount,tran_date,card_type})
+            let wallet = await Wallet.findOne({'user':req.user._id});
+            wallet.amount+=amount;
+            await wallet.save();
+            res.json({msg:'Payment Success',amount,tran_id})
+            return
+        }else{
+            res.status(500).jsno({msg:`Payment Invalid`})
+        }
+    }catch(err){
+        res.status(500).jsno({msg:`Payment Invalid : ${err.message}`})
+    } 
     
 }
 

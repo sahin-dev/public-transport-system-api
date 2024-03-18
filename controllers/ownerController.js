@@ -26,8 +26,14 @@ const assignDriver = async(req,res,next)=>{
             return;
         }
 
-        vehicle.driver_id = driver._id;
-        driver.role = DRIVER;
+        if(vehicle.status === 'Pending'){
+            res.status(400);
+            res.json({status:"failed",msg:"Vehicle is not active!"});
+            return;
+        }
+
+        vehicle.driver = driver._id;
+        driver.role = 'driver';
         driver = await driver.save();
         vehicle = await vehicle.save();
         const data = {
@@ -42,7 +48,7 @@ const assignDriver = async(req,res,next)=>{
        
     }catch(err){
         res.status(400);
-        res.json({status:"failed", msg:"Assign driver failed"})
+        res.json({status:"failed", msg:`Assign driver failed : ${err.message}`})
     }
 };
 
@@ -67,8 +73,14 @@ const assignSupervisor = async(req,res,next)=>{
             return;
         }
 
-        vehicle.supervisor_id = supervisor._id;
-        supervisor.role = SUPERVISOR;
+        if(vehicle.status === 'pending'){
+            res.status(400);
+            res.json({status:"failed",msg:"Vehicle is not active!"});
+            return;
+        }
+
+        vehicle.supervisor = supervisor._id;
+        supervisor.role = 'supervisor';
         supervisor.save();
         vehicle.save();
         const data = {
@@ -82,7 +94,7 @@ const assignSupervisor = async(req,res,next)=>{
         
     }catch(err){
         res.status(400);
-        res.json({status:"failed", msg:"Assign supervisor failed"})
+        res.json({status:"failed", msg:`Assign supervisor failed : ${err.message}`})
     }
 };
 
@@ -92,12 +104,12 @@ const assignSupervisor = async(req,res,next)=>{
 
 const getVehicles = async(req,res,next)=>{
     try{
-        const vehicles = await Vehicle.find({'owner':req.user._id});
+        const vehicles = await Vehicle.find({'owner':req.user._id}).select(['-owner','-_id']);
         res.status(200);
         res.json({status:"success",msg:"Vehicles fetched successfully",data:vehicles});
     }catch(err){
         res.status(400);
-        res.json({status:"failed", msg:"Vehicles fetched failed"})
+        res.json({status:"failed", msg:`Vehicles fetched failed : ${err.message}`})
     }
     
 };
@@ -115,7 +127,25 @@ const getVehicle = async(req,res,next)=>{
 
     }catch(err){
         res.status(400);
-        res.json({status:"failed", msg:"Vehicle fetched failed"})
+        res.json({status:"failed", msg:`Vehicle fetched failed : ${err.message}`})
+    }
+    
+};
+
+// @desc get  a single vehicle for a specific user
+// @route GET /api/user/owner/vehicles/:status
+// @access Private
+
+const getVehiclesByStatus = async(req,res,next)=>{
+    const status = req.params.status;
+    try{
+        const vehicles = await Vehicle.find({'owner':req.user._id,status});
+        res.status(200);
+        res.json({status:"success",msg:"Vehicle fetched successfully",data:vehicles});
+
+    }catch(err){
+        res.status(400);
+        res.json({status:"failed", msg:`Vehicle fetched failed : ${err.message}`})
     }
     
 };
@@ -136,7 +166,7 @@ const addVehicleRequest = async(req,res,next)=>{
             return;
         }
         
-        const request = await Request.create({user_id:user._id,type:"Vehicle addition request",body:req.body});
+        const request = await Request.create({user:user._id,type:"Vehicle addition request",body:req.body});
         const vehicle = await Vehicle.create({name,desc,type,number,owner:user._id,route});
         
         res.status(200);
@@ -144,7 +174,7 @@ const addVehicleRequest = async(req,res,next)=>{
         
     }catch(err){
         res.status(400);
-        res.json({status:"failed", msg:"Vehicle addition failed"})
+        res.json({status:"failed", msg:`Vehicle addition failed: ${err.message}`})
     }
 };
 
@@ -154,11 +184,11 @@ const addVehicleRequest = async(req,res,next)=>{
 
 const getRequests = async(req,res,next)=>{
     try{
-        const requests = await Request.find({"user_id":req.user._id});
+        const requests = await Request.find({"user":req.user._id}).populate('user',['name','-_id','email','phone']);
         res.status(200).json({status:"success",msg:"Requests fetched successfully",data:requests});
     }catch(err){
         res.status(500);
-        next(createError("Internal server error!"));
+        res.json({status:"failed", msg:`Request fetching failed: ${err.message}`})
     }
 }
 
@@ -181,7 +211,8 @@ const removeVehicle = async(req,res,next)=>{
         res.status(200).json({status:"success", msg:"Vehicle deleted successfully"});
         
     }catch(err){
-        next(createError(400,"Deleting vehicle failed"));
+        res.status(400);
+        res.json({status:'failed',msg:`Deleting vehicle failed : ${err.message}`})
     }
 };
 
@@ -225,5 +256,5 @@ const getSupervisorDetails = async(req,res,next)=>{
 
 }
 
-module.exports = {assignDriver, assignSupervisor,getVehicles, getVehicle ,
+module.exports = {assignDriver, assignSupervisor,getVehicles, getVehicle ,getVehiclesByStatus,
     addVehicleRequest,getRequests, removeVehicle, editVehicle, changeStatus, requestWithdraw, addBank, getDriverDetails, getSupervisorDetails};

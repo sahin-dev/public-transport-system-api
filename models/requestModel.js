@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 
 const requestSchema = new mongoose.Schema({
-    user_id:{
+    user:{
         type:mongoose.ObjectId,
+        ref:'User',
         required:true
     },
     type:{

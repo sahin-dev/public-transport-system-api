@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const walletSchema = new mongoose.Schema({
-    
+    user:{
+        type:mongoose.ObjectId,
+        ref:'User',
+        required:false,
+    },
     amount:{
         type:Number,
         required:true,
