@@ -11,6 +11,7 @@ const ownerRouter =require('./routes/ownerRouter');
 const adminRouter = require('./routes/adminRouter');
 const paymentRouter = require('./routes/paymentRouter')
 const connectDb = require('./config/db');
+const cors = require('cors');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -21,6 +22,7 @@ connectDb();
 var app = express();
 
 app.use(logger('dev'));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

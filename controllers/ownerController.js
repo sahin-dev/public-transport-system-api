@@ -15,7 +15,7 @@ const assignDriver = async(req,res,next)=>{
     const user = req.user;
     try{
         let driver = await User.findOne({email}).select("-password");
-        let vehicle = await Vehicle.findOne({_id:vehicle_id,owner_id:user._id});
+        let vehicle = await Vehicle.findOne({_id:vehicle_id,owner:user._id});
 
         if(!vehicle){
             res.status(404).json({status:'failed',msg:"Sorry! Vehicle not found"});
