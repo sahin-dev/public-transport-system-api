@@ -55,7 +55,7 @@ const assignSupervisor = async(req,res,next)=>{
     const user = req.user;
     try{
         const supervisor = await User.findOne({email}).select('-password');
-        const vehicle = await Vehicle.find({_id:vehicle_id,owner_id:user._id});
+        const vehicle = await Vehicle.find({_id:vehicle_id,owner:user._id});
 
         
         if(!vehicle){
