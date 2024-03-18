@@ -23,6 +23,7 @@ const loginUser = async(req,res,next)=>{
                 id:user._id,
                 name:user.name,
                 email:user.email,
+                role:user.role,
                 token:generateToken(user._id)});
     }else{
         next(createError(401,"Invalid email or password"));
