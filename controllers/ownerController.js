@@ -26,7 +26,13 @@ const assignDriver = async(req,res,next)=>{
             return;
         }
 
-        if(vehicle.status === 'Pending'){
+        if(vehicle.driver){
+            res.status(403);//403 - already exists
+            res.json({status:"failed", msg: "Driver already added!"});
+            return;
+        }
+
+        if(vehicle.status === 'pending'){
             res.status(400);
             res.json({status:"failed",msg:"Vehicle is not active!"});
             return;
@@ -60,8 +66,8 @@ const assignSupervisor = async(req,res,next)=>{
     const {email,vehicle_id} = req.body;
     const user = req.user;
     try{
-        const supervisor = await User.findOne({email}).select('-password');
-        const vehicle = await Vehicle.find({_id:vehicle_id,owner:user._id});
+        let supervisor = await User.findOne({email}).select('-password');
+        let vehicle = await Vehicle.findOne({_id:vehicle_id,owner:user._id});
 
         
         if(!vehicle){
@@ -73,6 +79,12 @@ const assignSupervisor = async(req,res,next)=>{
             return;
         }
 
+        if(vehicle.supervisor){
+            res.status(403);//403 - already exists
+            res.json({status:"failed", msg: "Supervisor already added!"});
+            return;
+        }
+
         if(vehicle.status === 'pending'){
             res.status(400);
             res.json({status:"failed",msg:"Vehicle is not active!"});
@@ -81,8 +93,8 @@ const assignSupervisor = async(req,res,next)=>{
 
         vehicle.supervisor = supervisor._id;
         supervisor.role = 'supervisor';
-        supervisor.save();
-        vehicle.save();
+        supervisor = await supervisor.save();
+        vehicle = await vehicle.save();
         const data = {
             supervisor_name:supervisor.name,
             supervisor_phone:supervisor.phone,
@@ -104,7 +116,7 @@ const assignSupervisor = async(req,res,next)=>{
 
 const getVehicles = async(req,res,next)=>{
     try{
-        const vehicles = await Vehicle.find({'owner':req.user._id}).select(['-owner','-_id']);
+        const vehicles = await Vehicle.find({'owner':req.user._id}).select(['-owner']);
         res.status(200);
         res.json({status:"success",msg:"Vehicles fetched successfully",data:vehicles});
     }catch(err){
