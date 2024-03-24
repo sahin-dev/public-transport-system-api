@@ -16,7 +16,7 @@ const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live)
 const tran_id = generateId.generate({length:8,charset:'hex',capitalization:'uppercase'})
 
 //@desc Initiate Payment
-//@route GET api/payment
+//@route POST api/payment
 //@access Private
 const initPayment = (req,res,next)=>{
     const {amount = 1000,c_name = "Sahin",c_email = 'sahin@gmail.com',c_phone='01621839863'} = req.body

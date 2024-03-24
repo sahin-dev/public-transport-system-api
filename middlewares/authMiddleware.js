@@ -13,11 +13,13 @@ const protect = asyncHandler(async (req, res, next) => {
           next();
           return;
       }catch(err){
-          next(createError(401,"Not authorized, token failed"));
-         return;
+        res.status(401);
+        res.json({status:"failed", msg:`Not authorized, token failed ${err.message}`})
+        return;
       }
   }
-  next(createError(401,"Not authorized, no token"));
+  res.status(401);
+  res.json({status:"failed", msg:`Not authorized, no token ${err.message}`})
 })
 
 const admin = (req, res, next) => {
