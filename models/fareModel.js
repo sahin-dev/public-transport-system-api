@@ -2,11 +2,13 @@ const mongoose = require('mongoose');
 
 const fareSchema = new mongoose.Schema({
     passenger:{
-        type:Object,
+        type:mongoose.ObjectId,
+        ref:"User",
         required:true,
     },
     vehicle:{
-        type:Object,
+        type:mongoose.ObjectId,
+        ref:"Vehicle",
         required:true,
     },
     amount:{
@@ -28,3 +30,6 @@ const fareSchema = new mongoose.Schema({
 },{
     timestamps:true
 })
+
+const Fare = mongoose.model('Fare',fareSchema);
+module.exports = Fare;

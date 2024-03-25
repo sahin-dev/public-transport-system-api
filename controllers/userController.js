@@ -5,6 +5,7 @@ const generateToken = require('../utils/generateToken');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const Wallet = require('../models/walletModel');
+const Vehicle = require('../models/vehicleModel');
 
 const getUser =  async(req,res,next)=>{
     res.json(req.user);
@@ -27,7 +28,8 @@ const loginUser = async(req,res,next)=>{
                 wallet:user.wallet,
                 token:generateToken(user._id)});
     }else{
-        next(createError(401,"Invalid email or password"));
+        res.status(401);
+        res.json({status:"failed",msg:"Invalid email or password"})
     }
 }
 
@@ -203,6 +205,12 @@ const getUserProfile = asyncHandler(async (req, res) => {
       res.status(500).jsno({msg:"Error occured to add money"})
     }
 
+  }
+
+  const pay = async(req,res,next)=>{
+    const {amount,uniqueId} = req.body;
+    const user = req.user;
+    const vehicle = await Vehicle.find({uniqueId});
 
   }
 
