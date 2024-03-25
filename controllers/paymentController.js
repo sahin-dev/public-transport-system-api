@@ -19,12 +19,14 @@ const tran_id = generateId.generate({length:8,charset:'hex',capitalization:'uppe
 //@route POST api/payment
 //@access Private
 const initPayment = (req,res,next)=>{
+    
     const {amount = 1000,c_name = "Sahin",c_email = 'sahin@gmail.com',c_phone='01621839863'} = req.body
+    
     const data = {
         total_amount: amount,
         currency: 'BDT',
         tran_id, 
-        success_url: `http://localhost:${port}/api/payment/success`,
+        success_url: `http://localhost:${port}/api/payment/success/${req.user._id}`,
         fail_url: `http://localhost:${port}/api/payment/fail`,
         cancel_url: `http://localhost:${port}/api/payment/cancel`,
         ipn_url: `http://localhost:${port}/api/payment/ipn`,
@@ -55,8 +57,8 @@ const initPayment = (req,res,next)=>{
         // Redirect the user to payment gateway
        
         let GatewayPageURL = apiResponse.GatewayPageURL
-        //res.setHeader('Access-Control-Allow-Origin', "*")
-        res.redirect(GatewayPageURL)
+        res.setHeader('origin', "http://localhost:3000/")
+        res.send(GatewayPageURL)
         
         console.log('Redirecting to: ', GatewayPageURL)
         
@@ -72,21 +74,24 @@ const IPN = (req,res,next)=>{
 const paymentSuccess = async (req,res,next)=>{
     
     const {val_id} = req.body
+    const uid = req.params.uid
+    console.log(req.body)
     try{
         const {status,tran_date,tran_id,amount,card_type} = await sslcz.validate({val_id})
 
         if(status === 'VALID'){
-            await Payment.create({user:req.user,tran_id,amount,tran_date,card_type})
-            let wallet = await Wallet.findOne({'user':req.user._id});
-            wallet.amount+=amount;
+            await Payment.create({tran_id,amount,tran_date,card_type})
+            let wallet = await Wallet.findOne({'user':uid});
+            wallet.amount+=Number(amount);
             await wallet.save();
-            res.json({msg:'Payment Success',amount,tran_id})
-            return
+            res.redirect("http://localhost:5173/payment/success")
+            return;
         }else{
-            res.status(500).jsno({msg:`Payment Invalid`})
+            res.status(500).json({msg:`Payment Invalid`})
+            return;
         }
     }catch(err){
-        res.status(500).jsno({msg:`Payment Invalid : ${err.message}`})
+        res.status(500).json({msg:`Payment Invalid : ${err.message}`})
     } 
     
 }

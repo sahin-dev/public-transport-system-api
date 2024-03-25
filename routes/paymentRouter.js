@@ -5,7 +5,7 @@ const {protect} = require('../middlewares/authMiddleware')
 
 
 router.route('').post(protect,initPayment)
-router.route('/success').post(protect,paymentSuccess)
+router.route('/success/:uid').post(paymentSuccess)
 router.route('/fail').post(protect,paymentFail)
 router.route('/cancel').post(protect,paymentCancel)
 router.route('/ipn').post(IPN)
