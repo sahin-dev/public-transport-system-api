@@ -6,12 +6,10 @@ class Stopage{
     getName(){
         return this.name;
     }
-    addConnection(stopage,length){
-        if(!(stopage instanceof Stopage)){
-            return new Error("Not instance of Stopage");
-        }
-        this.connected_stopages.push({stopage,length});
-        stopage.connected_stopages.push({stopage:this,length});
+    addConnection(stopage_name,length){
+        let stopage = new Stopage(stopage_name);
+        this.connected_stopages.push(stopage);
+        //stopage.connected_stopages.push({stopage:this,length});
     }
     getConnectedStopages(){
         return this.connected_stopages;

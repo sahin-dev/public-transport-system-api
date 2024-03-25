@@ -37,7 +37,7 @@ app.use(function(req, res, next) {
 
 
 app.use('/api/users', userRouter);
-app.use('/api/routes',routeRouter);
+app.use('/api/route',routeRouter);
 app.use('/api/passengers',passengerRouter);
 app.use('/api/user/owner',ownerRouter);
 app.use('/api/admin',adminRouter);
