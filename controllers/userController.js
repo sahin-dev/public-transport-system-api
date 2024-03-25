@@ -28,7 +28,8 @@ const loginUser = async(req,res,next)=>{
                 wallet:user.wallet,
                 token:generateToken(user._id)});
     }else{
-        next(createError(401,"Invalid email or password"));
+        res.status(401);
+        res.json({status:"failed",msg:"Invalid email or password"})
     }
 }
 
