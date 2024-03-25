@@ -53,9 +53,14 @@ const initPayment = (req,res,next)=>{
 
     sslcz.init(data).then(apiResponse => {
         // Redirect the user to payment gateway
+       
         let GatewayPageURL = apiResponse.GatewayPageURL
+    
+        
         res.redirect(GatewayPageURL)
+        
         console.log('Redirecting to: ', GatewayPageURL)
+        
     });
 }
 
