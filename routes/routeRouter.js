@@ -5,8 +5,8 @@ const router= express.Router();
 
 router.route('/').post(addRoute).put(updateRoute).get(getRoute);
 router.route('/routes').get(getRoutes);
-router.route('/stopage').get(getStopage).post(addStopage).put(updateStopage).delete(deleteStopage);
-router.route('/stopages').get(getStopages);
+router.route('/stopage').get(protect,getStopage).post(addStopage).put(updateStopage).delete(deleteStopage);
+router.route('/stopages').get(protect,getStopages);
 
 
 module.exports = router;

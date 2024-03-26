@@ -32,7 +32,16 @@ const addStopage = async(req,res,next)=>{
 //@access Private/Admin
 
 const getStopage = async(req,res,next)=>{
+    const {stopage_id} = req.body
+    const stopage  = await Stopage.findById(stopage_id);
+    if(!stopage){
+        res.status(404);
+        res.json({status:"failed", msg:"Status not found!"});
+        return;
+    }
 
+    res.status(200);
+    res.json({status:"success",msg:"Status found!",data:stopage});
 }
 
 //@desc Get  all  stopages
