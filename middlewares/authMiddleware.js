@@ -19,7 +19,7 @@ const protect = asyncHandler(async (req, res, next) => {
       }
   }
   res.status(401);
-  res.json({status:"failed", msg:`Not authorized, no token ${err.message}`})
+  res.json({status:"failed", msg:`Not authorized, no token`})
 })
 
 const admin = (req, res, next) => {
