@@ -43,7 +43,7 @@ const User = require('../models/userModel');
         const user = await User.findOne({phone})
         const tickets = await Ticket.find({user:user._id,vehicle:v_id});
         
-        let validTicket = tickets.map(t=> t.purchase_date<t.valid_till);
+        let validTicket = tickets.map(t=> t.valid_till<Date.now());
 
         res.status(200);
         res.json({status:'success', msg:'Tickets fetched successfully', data:validTicket});
@@ -91,7 +91,7 @@ const User = require('../models/userModel');
             throw new Error("Ticket is invalid");
         }
 
-        if(ticket.purchase_date>ticket.valid_till){
+        if(ticket.valid_till<Date.now()){
             throw new Error("Ticket expird")
         }
 
