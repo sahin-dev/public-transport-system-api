@@ -10,6 +10,7 @@ const passengerRouter = require('./routes/passengerRouter');
 const ownerRouter =require('./routes/ownerRouter');
 const adminRouter = require('./routes/adminRouter');
 const paymentRouter = require('./routes/paymentRouter')
+const supervisorRouter = require('./routes/supervisorRouter')
 const connectDb = require('./config/db');
 const cors = require('cors');
 
@@ -45,6 +46,7 @@ app.use(function(req, res, next) {
 app.use('/api/users', userRouter);
 app.use('/api/route',routeRouter);
 app.use('/api/passengers',passengerRouter);
+app.use('/api/supervisor', supervisorRouter);
 app.use('/api/user/owner',ownerRouter);
 app.use('/api/admin',adminRouter);
 app.use('/api/payment',paymentRouter);

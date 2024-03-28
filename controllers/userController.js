@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const Wallet = require('../models/walletModel');
 const Vehicle = require('../models/vehicleModel');
+const Ticket = require('../models/ticketModel');
+const getTicketUID = require('../utils/ticketUID');
 
 const getUser =  async(req,res,next)=>{
     res.json(req.user);
@@ -207,14 +209,65 @@ const getUserProfile = asyncHandler(async (req, res) => {
 
   }
 
-  const pay = async(req,res,next)=>{
-    const {amount,uniqueId} = req.body;
-    const user = req.user;
-    const vehicle = await Vehicle.find({uniqueId});
+  //@desc Get vehicle by unique id
+  //@route GET api/users/vehicle/:uid
+  //@access Private
 
+  const getVehicleByUID = async(req,res,next)=>{
+    const {uid} = req.params.uid;
+    try{
+      const vehicle = await Vehicle.findOne({uniqueId:uid});
+      if(! vehicle){
+        throw new Error("Invalid vehicle uid");
+      }
+      if(vehicle.status == 'pending'){
+        throw new Error("Vahicle is not active");
+        
+      }
+      res.status(200);
+      res.json({status:'success',msg:"Vehicle found!", data:vehicle});
+    }catch(err){
+      res.status(400);
+      res.json({status:'failed',msg:`vehicle not found: ${err.message}`})
+    }
   }
+
+  //@desc Purchase a ticket
+  //@route POST api/users/purchase
+  //@access Private
+
+  
+const purchaseTicket = async(req,res,next)=>{
+  const {source, destination,amount,vehicleuid} = req.body;
+  const user = req.user;
+  const ticketUID = getTicketUID();
+  try{
+
+    if( (!amount) || (!vehicleuid)|| (!source) || (!destination)  ){
+      throw new Error('source, destination, amount and uid required')
+    }
+    
+
+    const vehicle = await Vehicle.findOne({uniqueId:vehicleuid});
+    if(! vehicle){
+      throw new Error('Vehicle not found')
+    }
+    const wallet = await Wallet.findOne({user:user._id});
+    if(wallet.amount<Number(amount)){
+      throw new Error("Insufficient amount");
+    }
+    wallet.amount-=Number(amount)||0;
+    await wallet.save();
+    const ticket = await Ticket.create({user:user._id,vehicle:vehicle._id, amount, source, destination,ticketUID});
+    res.status(200);
+    res.json({status:'success', msg:'Ticket purchased ', data:ticket})
+  }catch(err){
+    res.status(400);
+    res.json({status:'failed', msg:`Purchase failed : ${err.message}`})
+  }
+}
 
 
 module.exports = {getUser,loginUser,registerUser, deleteUser,
    getUserById,getUserProfile,updateUserProfile,getUsers, updateUser,
-    addMoney};
+    addMoney, purchaseTicket, getVehicleByUID};

@@ -46,7 +46,7 @@ const getStopage = async(req,res,next)=>{
 
 //@desc Get  all  stopages
 //@route GET api/route/stopages
-//@access private/Admin
+//@access private
 
 const getStopages = async(req,res,next)=>{
     const stopages = await Stopage.find({}).select('-connected_routes');
