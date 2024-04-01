@@ -91,7 +91,7 @@ const User = require('../models/userModel');
             throw new Error("Ticket is invalid");
         }
 
-        if(ticket.valid_till<Date.now()){
+        if(ticket.valid_till<=Date.now()){
             throw new Error("Ticket expird")
         }
 
