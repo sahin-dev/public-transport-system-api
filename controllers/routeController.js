@@ -32,7 +32,7 @@ const addStopage = async(req,res,next)=>{
 //@access Private/Admin
 
 const getStopage = async(req,res,next)=>{
-    const {stopage_id} = req.body
+    const {stopage_id} = req.body;
     const stopage  = await Stopage.findById(stopage_id);
     if(!stopage){
         res.status(404);
@@ -63,7 +63,7 @@ const deleteStopage = async(req,res,next)=>{
 
 //@desc Add route between stopages
 //@route POST api/route
-//@access Private
+//@access Private/Admin
 
 const addRoute = async(req,res,next)=>{
     //source and destination is id of Stopage document in mongodb
