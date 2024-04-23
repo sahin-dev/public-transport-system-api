@@ -3,8 +3,8 @@ const mailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'farewell@gmail.com',
-      pass: 'farewell'
+      user: 'farewell470@gmail.com',
+      pass: 'Farewell@470!'
     }
   });
 
