@@ -178,7 +178,7 @@ const addVehicleRequest = async(req,res,next)=>{
             return;
         }
         
-        const request = await Request.create({user:user._id,type:"Vehicle addition request",body:req.body});
+        // const request = await Request.create({user:user._id,type:"Vehicle addition request",body:req.body});
         const vehicle = await Vehicle.create({name,desc,type,number,owner:user._id,route});
         
         res.status(200);
