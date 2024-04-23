@@ -14,6 +14,11 @@ const requestSchema = new mongoose.Schema({
         type:Object,
         required:true
     },
+    status:{
+        type:String,
+        default:"pending",
+        enum:['pending','accepted', 'declined']
+    },
     isResolved:{
         type:Boolean,
         required:true,

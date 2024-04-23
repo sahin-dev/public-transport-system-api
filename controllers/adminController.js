@@ -29,6 +29,48 @@ const getRequestsByResolve = async(req,res,next)=>{
     
 }
 
+//@desc Get a Request
+//@route GET api/admin/request
+//@access Private/Admin
+
+const getRequest = async(req,res,next)=>{
+    const {req_id} = req.body;
+
+    try{
+        const request = await Request.findById(req_id);
+        if(!request){
+            throw new Error("Request not found");
+        }
+
+        res.json({status:'success', msg:'Request found', data:request});
+    }catch(err){
+        res.status(400);
+        res.json({status:'success', msg:'Request not found'});
+    }
+}
+
+//@desc Resolve a request
+//@route UPDATE api/admin/request
+//@access Private/Admin
+
+const resolveRequest = async(req,res,next)=>{
+    const {req_id, status} = req.body;
+    try{
+        const request = await Request.findById(req_id).populate('user');
+        if(!request){
+            throw new Error("Request not found!");
+        }
+        request.isResolved = true;
+        request.status = status;
+        await request.save();
+        mailSender(request.user.email, `Request is ${status}`, `Your request is ${status}.\n Thank you`);
+        res.json({status:'success', msg:'Request resolved'});
+    }catch(err){
+        res.status(400);
+        res.json({status:'success', msg:'Request not found'});
+    }
+}
+
 //@desc Approve a transport
 //@route POST api/admin/vehicle/approve
 //@access Private/Admin
@@ -127,4 +169,4 @@ const addRoute = async(req,res,next)=>{
 
 
 module.exports = {getRequestsByResolve, approveTransport, getAllTransport, 
-    getAllUsers, addStopage, addRoute}
+    getAllUsers, addStopage, addRoute, resolveRequest, getRequest}

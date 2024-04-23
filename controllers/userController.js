@@ -248,7 +248,8 @@ const purchaseTicket = async(req,res,next)=>{
     }
     
 
-    const vehicle = await Vehicle.findOne({uniqueId:vehicleuid});
+    const vehicle = await Vehicle.findOne({uniqueId:vehicleuid}).populate('owner');
+    const owner_wallet = await Wallet.findOne({user:vehicle.owner._id});
     if(! vehicle){
       throw new Error('Vehicle not found')
     }
@@ -257,8 +258,10 @@ const purchaseTicket = async(req,res,next)=>{
       throw new Error("Insufficient amount");
     }
     wallet.amount-=Number(amount)||0;
+    owner_wallet.amount+=Number(amount)||0;
     await wallet.save();
     const ticket = await Ticket.create({user:user._id,vehicle:vehicle._id, amount, source, destination,ticketUID});
+    
     res.status(200);
     res.json({status:'success', msg:'Ticket purchased ', data:ticket})
   }catch(err){
