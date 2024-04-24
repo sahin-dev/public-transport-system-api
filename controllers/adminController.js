@@ -2,6 +2,7 @@
 const Request = require('../models/requestModel');
 const Vehicle = require('../models/vehicleModel');
 const User = require('../models/userModel');
+const Ticket = require('../models/ticketModel')
 const {Stopage} = require('../models/routeModel')
 const mailSender = require('../service/mail')
 
@@ -111,6 +112,16 @@ const getAllTransport = async(req,res,next)=>{
     res.json({status:'success', msg:'Vechicles fetched successfully', data:vehicles});
 }
 
+//@desc Get the all transport
+//@route POST api/admin/vehicles
+//@access Private/admin
+
+const getAllTransportByStatus = async(req,res,next)=>{
+    const {status} = req.body;
+    const vehicles = await Vehicle.find({status});
+    res.json({status:'success', msg:'Vechicles fetched successfully', data:vehicles});
+}
+
 //@desc Get the all users
 //@route GET api/admin/users
 //@access Private/Admin
@@ -176,5 +187,29 @@ const addRoute = async(req,res,next)=>{
 }
 
 
-module.exports = {getRequestsByResolve, approveTransport, getAllTransport, 
-    getAllUsers, addStopage, addRoute, resolveRequest, getRequest}
+//@desc Get all tickets 
+//@route GET api/admin/tickets
+//@access Private/Admin
+
+const getTickets = async(req,res,next)=>{
+    const tickets = await Ticket.find({}).populate('user', 'vehicle');
+    res.json({status:'success', msg:'Tickets fetched successfully', count:tickets.length, data:tickets})
+}
+
+//@desc Get a ticket by UID
+//@route GET api/admin/ticket/:uid
+//@access Private/Admin
+
+const getTicketByUID = async(req,res,next)=>{
+    const uid = req.query.uid;
+    const ticket = await Ticket.findOne({ticketUID:uid}).populate('user', 'vehicle');
+    if(ticket){
+        res.json({status:'success',msg:'Ticket found', data:ticket});
+        return;
+    }
+    res.status(404);
+    res.json({status:'failed', msg:'Ticket not found!'});
+}
+
+module.exports = {getRequestsByResolve, approveTransport, getAllTransport, getTicketByUID, getTickets,
+    getAllUsers, addStopage, addRoute, resolveRequest, getRequest, getAllTransportByStatus}
