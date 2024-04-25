@@ -95,7 +95,8 @@ const approveTransport = async(req,res,next)=>{
         vehicle.status = 'active';
         await vehicle.save();
         //send a mail to the owner
-        mailSender(vehicle.owner.email, "Vehicle activation!", `Your vehicle with BRTA number ${vehicle.number} is activated`);
+        if(vehicle.owner.email)
+            mailSender(vehicle.owner.email, "Vehicle activation!", `Your vehicle with BRTA number ${vehicle.number} is activated`);
         res.json({status:'success', msg:'Vehicle activate successfully', data:vehicle});
     }catch(err){
         res.status(404);

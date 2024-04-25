@@ -1,10 +1,13 @@
 const mailer = require('nodemailer');
 
 const transporter = mailer.createTransport({
-    service: 'gmail',
+  service: "Gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
     auth: {
       user: 'farewell470@gmail.com',
-      pass: 'Farewell@470!'
+      pass: 'dpfi otqf wxfx mkej'
     }
   });
 
