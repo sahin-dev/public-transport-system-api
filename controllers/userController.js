@@ -273,7 +273,8 @@ const purchaseTicket = async(req,res,next)=>{
 }
 
 //@desc Confirm supervisor request
-  //@route GET api/user/confirm/:reqid
+//@route GET api/user/confirm/:reqid
+//@access Public
 
   const confirmRequst = async(req,res,next)=>{
     const req = req.query.reqid;
@@ -329,7 +330,7 @@ const purchaseTicket = async(req,res,next)=>{
 
   
 //@desc Get the all transport
-//@route GET api/user/vehicles
+//@route GET api/users/vehicles
 //@access Private
 
 const getAllTransport = async(req,res,next)=>{
@@ -339,4 +340,4 @@ const getAllTransport = async(req,res,next)=>{
 
 module.exports = {getUser,loginUser,registerUser, deleteUser,
    getUserById,getUserProfile,updateUserProfile,getUsers, updateUser,
-    addMoney, purchaseTicket, getVehicleByUID, getAllTransport};
+    addMoney, purchaseTicket, getVehicleByUID, getAllTransport, confirmRequst};
