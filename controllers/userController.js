@@ -305,7 +305,7 @@ const purchaseTicket = async(req,res,next)=>{
           trans_number:vehicle.number
           }
 
-          res.redirect('localhost:5173/mailconfirmed');
+        res.redirect(301, 'http://localhost:5173/mailconfirmed');
     }
     if(request.type === DRIVIER_ADDITION_REQUEST){
       let vehicle = await Vehicle.findById(body.vehicle);
@@ -324,7 +324,7 @@ const purchaseTicket = async(req,res,next)=>{
           trans_number:vehicle.number
           }
 
-          res.redirect('localhost:5173/mailconfirmed');
+        res.redirect(301, 'http://localhost:5173/mailconfirmed')
     }
     
   }
