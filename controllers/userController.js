@@ -277,9 +277,9 @@ const purchaseTicket = async(req,res,next)=>{
 //@access Public
 
   const confirmRequst = async(req,res,next)=>{
-    const req = req.query.reqid;
+    const req_id= req.query.reqid;
 
-    const request = await Request.findById(req);
+    const request = await Request.findById(req_id);
     if(!request){
       res.status(404);
       res.json({status:'failed', msg:'Request not found'});
