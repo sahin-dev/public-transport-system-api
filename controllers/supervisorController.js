@@ -87,13 +87,16 @@ const User = require('../models/userModel');
     const {ticket_id} = req.body;
 
     try{
-        const ticket = await Ticket.findById(ticket_id);
+        const ticket = await Ticket.findById(ticket_id).populate('vehicle');
         if(ticket.checked || ticket.invalid){
             throw new Error("Ticket is invalid");
         }
 
         if(ticket.valid_till<=Date.now()){
             throw new Error("Ticket expird")
+        }
+        if(ticket.vehicle.supervisor != req.user._id){
+          throw new Error("You are not authrized to check thc ticket");
         }
 
         ticket.checked = true;
@@ -108,6 +111,23 @@ const User = require('../models/userModel');
     }
   }
 
+    //@desc Check ticket
+  //@route GET api/supervisor/vehicle
+  //@access Private
+
+  const getMyVehicle = async(req,res,next)=>{
+    const supervisor = req.user;
+    const vehicle = await Vehicle.findOne({supervisor:supervisor._id}).populate('owner', 'driver');
+
+    if(!vehicle){
+      res.status(404);
+      res.json({status:'failed', msg:'Vehicle not found'});
+      return;
+    }
+
+    res.json({status:'success', msg:'Vehicle found', data:vehicle});
+
+  }
   
 
-  module.exports = {checkTicket, getTicketByUID,getTickets}
+  module.exports = {checkTicket, getTicketByUID,getTickets, getMyVehicle}
