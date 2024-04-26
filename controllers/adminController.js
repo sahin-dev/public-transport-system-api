@@ -4,7 +4,9 @@ const Vehicle = require('../models/vehicleModel');
 const User = require('../models/userModel');
 const Ticket = require('../models/ticketModel')
 const {Stopage} = require('../models/routeModel')
-const mailSender = require('../service/mail')
+const mailSender = require('../service/mail');
+
+const {VEHICLE_ADDITION_REQUEST, WITHDRAW_REQUEST} = require('../utils/constants')
 
 
 //@desc Get requests based on resolve or not
@@ -28,6 +30,17 @@ const getRequestsByResolve = async(req,res,next)=>{
         res.json({status:'failed',msg:'Request fetching failed!'});
     }
     
+}
+
+//@desc Get requests by type
+//@route GET api/admin/request/:type
+//@access Private
+
+const getRequestsByType = async(req,res,next)=>{
+    const t = req.query.type;
+    const requests = await Request.find({type:Number(t)}).populate('user');
+
+    res.json({status:'success', msg:'Requests fetched successfully', data:requests});
 }
 
 //@desc Get a Request
@@ -213,4 +226,5 @@ const getTicketByUID = async(req,res,next)=>{
 }
 
 module.exports = {getRequestsByResolve, approveTransport, getAllTransport, getTicketByUID, getTickets,
-    getAllUsers, addStopage, addRoute, resolveRequest, getRequest, getAllTransportByStatus}
+    getAllUsers, addStopage, addRoute, resolveRequest, 
+    getRequest, getAllTransportByStatus, getRequestsByType}

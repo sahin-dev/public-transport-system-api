@@ -273,7 +273,7 @@ const purchaseTicket = async(req,res,next)=>{
 }
 
 //@desc Confirm supervisor request
-//@route GET api/user/confirm/:reqid
+//@route GET api/users/confirm/:reqid
 //@access Public
 
   const confirmRequst = async(req,res,next)=>{
@@ -304,7 +304,7 @@ const purchaseTicket = async(req,res,next)=>{
           trans_number:vehicle.number
           }
 
-          res.redirect('localhost:4000');
+          res.redirect('localhost:4000/mailconfirmed');
     }
     if(request.type === DRIVIER_ADDITION_REQUEST){
       const vehicle = await Vehicle.findById(body.vehicle);
@@ -323,7 +323,7 @@ const purchaseTicket = async(req,res,next)=>{
           trans_number:vehicle.number
           }
 
-          res.redirect('localhost:4000');
+          res.redirect('localhost:4000/mailconfirmed');
     }
     
   }

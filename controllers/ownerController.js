@@ -2,8 +2,11 @@
 const User = require('../models/userModel');
 const Vehicle = require('../models/vehicleModel');
 const Request = require('../models/requestModel');
-const {DRIVER,SUPERVISOR} = require('../utils/constants');
+const Wallet = require('../models/walletModel');
+
+const {WITHDRAW_REQUEST, VEHICLE_ADDITION_REQUEST, SUPERVISOR_ADDITION_REQUEST, DRIVIER_ADDITION_REQUEST} = require('../utils/constants');
 const createError = require('http-errors');
+const mailSender = require('../service/mail');
 
 
 // @desc assign driver for specific vehicle
@@ -37,20 +40,15 @@ const assignDriver = async(req,res,next)=>{
             res.json({status:"failed",msg:"Vehicle is not active!"});
             return;
         }
+        const request = await Request.create({user:req.user._id,type:DRIVIER_ADDITION_REQUEST, body:{
+            driver:driver._id,
+            vehicle:vehicle._id,
+        }});
+        mailSender(driver.email, "Confirm to join as a driver", `You are appointed as driver for this following vehicle.\n Name:  ${vehicle.name}\n Number: ${vehicle.number}.
+        To join click on the link:  http://localhost:3000/api/users/confirm/${request._id}\n`);
 
-        vehicle.driver = driver._id;
-        driver.role = 'driver';
-        driver = await driver.save();
-        vehicle = await vehicle.save();
-        const data = {
-            driver_name:driver.name,
-            driver_phone:driver.phone,
-            driver_nid:driver.nid,
-            trans_name:vehicle.name,
-            trans_number:vehicle.number
-            }
-
-        res.status(200).json({status:"success",msg:"Driver added successfully",data});
+       
+        res.status(200).json({status:"success",msg:"Email sent to driver for confirmation"});
        
     }catch(err){
         res.status(400);
@@ -90,19 +88,15 @@ const assignSupervisor = async(req,res,next)=>{
             res.json({status:"failed",msg:"Vehicle is not active!"});
             return;
         }
+        const request = await Request.create({user:req.user._id,type:SUPERVISOR_ADDITION_REQUEST, body:{
+            supervisor:supervisor._id,
+            vehicle:vehicle._id,
+        }});
+        mailSender(supervisor.email, "Confirm to join as a supervisor", `You are appointed as supervisor for this following vehicle.\n Name:  ${vehicle.name}\n Number: ${vehicle.number}.
+        To join click on the link:  http://localhost:3000/api/users/confirm/${request._id}\n`);
 
-        vehicle.supervisor = supervisor._id;
-        supervisor.role = 'supervisor';
-        supervisor = await supervisor.save();
-        vehicle = await vehicle.save();
-        const data = {
-            supervisor_name:supervisor.name,
-            supervisor_phone:supervisor.phone,
-            supervisor_nid:supervisor.nid,
-            trans_name:vehicle.name,
-            trans_number:vehicle.number
-            }
-        res.status(200).json({status:"success",msg:"Supervisor added successfully",data});
+       
+        res.status(200).json({status:"success",msg:"Email sent to supervisor for confirmation"});
         
     }catch(err){
         res.status(400);
@@ -178,7 +172,7 @@ const addVehicleRequest = async(req,res,next)=>{
             return;
         }
         
-        const request = await Request.create({user:user._id,type:process.env.VEHICLE_ADDITION_REQUEST,body:req.body});
+        const request = await Request.create({user:user._id,type:VEHICLE_ADDITION_REQUEST,body:req.body});
         const vehicle = await Vehicle.create({name,desc,type,number,owner:user._id,route});
         
         res.status(200);
@@ -245,7 +239,23 @@ const changeStatus = async(req,res,next)=>{};
 // @route POST /api/user/owner/withdraw
 // @access Private
 const requestWithdraw = async(req,res,next)=>{
+    const {amount, bank_name,bank_branch, bank_acc} = req.body;
+   if( (!amount) || (amount<=0)){
+        res.status(400);
+        res.json({status:'failed', msg:'provided amount is invalid'});
+        return;
+   }
+   const wallet = await Wallet.findOne({user:req.user._id});
+   if(wallet.amount < Number(amount)){
+        res.status(400);
+        res.json({status:'failed', msg:'Insufficient balance'});
+        return;
+   }
+   wallet.amount-=Number(amount);
+   let body = {amount,bank_name, bank_branch, bank_acc};
+   const request= await Request.create({user:req.user, type:WITHDRAW_REQUEST, body});
 
+   res.json({status:'success', msg:'Request submitted successfully'});
 };
 
 // @desc get vehicles for a specific user

@@ -1,6 +1,7 @@
 const Wallet = require('../models/walletModel')
 const Vehicle = require('../models/vehicleModel')
 const Ticket = require('../models/ticketModel');
+const Request = require('../models/requestModel');
 const User = require('../models/userModel');
 
 
@@ -106,5 +107,7 @@ const User = require('../models/userModel');
         res.json({status:'failed', msg:`Ticket checking failed: ${err.message}`})
     }
   }
+
+  
 
   module.exports = {checkTicket, getTicketByUID,getTickets}
