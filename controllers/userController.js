@@ -9,6 +9,8 @@ const Vehicle = require('../models/vehicleModel');
 const Ticket = require('../models/ticketModel');
 const getTicketUID = require('../utils/ticketUID');
 
+const {DRIVIER_ADDITION_REQUEST, SUPERVISOR_ADDITION_REQUEST} = require('../utils/constants')
+
 const getUser =  async(req,res,next)=>{
     res.json(req.user);
 }
@@ -251,7 +253,7 @@ const purchaseTicket = async(req,res,next)=>{
     const vehicle = await Vehicle.findOne({uniqueId:vehicleuid}).populate('owner');
     const owner_wallet = await Wallet.findOne({user:vehicle.owner._id});
     if(! vehicle){
-      throw new Error('Vehicle not found')
+      throw new Error('Vehicle not found');
     }
     const wallet = await Wallet.findOne({user:user._id});
     if(wallet.amount<Number(amount)){
@@ -270,7 +272,71 @@ const purchaseTicket = async(req,res,next)=>{
   }
 }
 
+//@desc Confirm supervisor request
+  //@route GET api/user/confirm/:reqid
+
+  const confirmRequst = async(req,res,next)=>{
+    const req = req.query.reqid;
+
+    const request = await Request.findById(req);
+    if(!request){
+      res.status(404);
+      res.json({status:'failed', msg:'Request not found'});
+      return;
+    }
+    let body = request.body;
+
+    if(request.type === SUPERVISOR_ADDITION_REQUEST){
+      const vehicle = await Vehicle.findById(body.vehicle);
+      const supervisor = await User.findById(body.supervisor);
+
+      vehicle.supervisor = supervisor._id;
+      supervisor.role = 'supervisor';
+      supervisor = await supervisor.save();
+      vehicle = await vehicle.save();
+
+      const data = {
+          supervisor_name:supervisor.name,
+          supervisor_phone:supervisor.phone,
+          supervisor_nid:supervisor.nid,
+          trans_name:vehicle.name,
+          trans_number:vehicle.number
+          }
+
+          res.redirect('localhost:4000');
+    }
+    if(request.type === DRIVIER_ADDITION_REQUEST){
+      const vehicle = await Vehicle.findById(body.vehicle);
+      const driver = await User.findById(body.driver);
+
+      vehicle.driver = driver._id;
+      driver.role = 'driver';
+      driver = await driver.save();
+      vehicle = await vehicle.save();
+
+      const data = {
+          driver_name:driver.name,
+          driver_phone:driver.phone,
+          driver_nid:driver.nid,
+          trans_name:vehicle.name,
+          trans_number:vehicle.number
+          }
+
+          res.redirect('localhost:4000');
+    }
+    
+  }
+
+  
+//@desc Get the all transport
+//@route GET api/user/vehicles
+//@access Private
+
+const getAllTransport = async(req,res,next)=>{
+  const vehicles = await Vehicle.find({});
+  res.json({status:'success', msg:'Vechicles fetched successfully', data:vehicles});
+}
 
 module.exports = {getUser,loginUser,registerUser, deleteUser,
    getUserById,getUserProfile,updateUserProfile,getUsers, updateUser,
-    addMoney, purchaseTicket, getVehicleByUID};
+    addMoney, purchaseTicket, getVehicleByUID, getAllTransport};
