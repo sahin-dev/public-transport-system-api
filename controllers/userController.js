@@ -70,8 +70,8 @@ const registerUser = async(req,res,next)=>{
 // @route   GET /api/users/profile
 // @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user._id).populate('wallet',['-user','-_id'])
-  
+    const user = await User.findById(req.user._id);
+    const wallet = await Wallet.findOne({user:user._id});
     if (user) {
       res.json({
         _id: user._id,
@@ -79,7 +79,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
         email: user.email,
         occupation:user.occupation,
         role:user.role,
-        wallet:user.wallet,
+        wallet,
         phone:user.phone,
         nid:user.nid,
         dob:user.dob,
@@ -263,6 +263,7 @@ const purchaseTicket = async(req,res,next)=>{
     wallet.amount-=Number(amount)||0;
     owner_wallet.amount+=Number(amount)||0;
     await wallet.save();
+    await owner_wallet.save();
     const ticket = await Ticket.create({user:user._id,vehicle:vehicle._id, amount, source, destination,ticketUID});
     
     res.status(200);
