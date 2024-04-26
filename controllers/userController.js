@@ -289,8 +289,8 @@ const purchaseTicket = async(req,res,next)=>{
     let body = request.body;
 
     if(request.type === SUPERVISOR_ADDITION_REQUEST){
-      const vehicle = await Vehicle.findById(body.vehicle);
-      const supervisor = await User.findById(body.supervisor);
+      let vehicle = await Vehicle.findById(body.vehicle);
+      let supervisor = await User.findById(body.supervisor);
 
       vehicle.supervisor = supervisor._id;
       supervisor.role = 'supervisor';
@@ -308,8 +308,8 @@ const purchaseTicket = async(req,res,next)=>{
           res.redirect('localhost:5173/mailconfirmed');
     }
     if(request.type === DRIVIER_ADDITION_REQUEST){
-      const vehicle = await Vehicle.findById(body.vehicle);
-      const driver = await User.findById(body.driver);
+      let vehicle = await Vehicle.findById(body.vehicle);
+      let driver = await User.findById(body.driver);
 
       vehicle.driver = driver._id;
       driver.role = 'driver';
