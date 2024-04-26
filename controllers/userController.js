@@ -7,6 +7,7 @@ const asyncHandler = require('express-async-handler');
 const Wallet = require('../models/walletModel');
 const Vehicle = require('../models/vehicleModel');
 const Ticket = require('../models/ticketModel');
+const Request = require('../models/requestModel');
 const getTicketUID = require('../utils/ticketUID');
 
 const {DRIVIER_ADDITION_REQUEST, SUPERVISOR_ADDITION_REQUEST} = require('../utils/constants')
@@ -304,7 +305,7 @@ const purchaseTicket = async(req,res,next)=>{
           trans_number:vehicle.number
           }
 
-          res.redirect('localhost:4000/mailconfirmed');
+          res.redirect('localhost:5173/mailconfirmed');
     }
     if(request.type === DRIVIER_ADDITION_REQUEST){
       const vehicle = await Vehicle.findById(body.vehicle);
@@ -323,7 +324,7 @@ const purchaseTicket = async(req,res,next)=>{
           trans_number:vehicle.number
           }
 
-          res.redirect('localhost:4000/mailconfirmed');
+          res.redirect('localhost:5173/mailconfirmed');
     }
     
   }
