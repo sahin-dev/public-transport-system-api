@@ -37,7 +37,7 @@ const getRequestsByResolve = async(req,res,next)=>{
 //@access Private
 
 const getRequestsByType = async(req,res,next)=>{
-    const t = req.query.type;
+    const t = req.params.type;
     const requests = await Request.find({type:Number(t)}).populate('user');
 
     res.json({status:'success', msg:'Requests fetched successfully', data:requests});
@@ -215,7 +215,7 @@ const getTickets = async(req,res,next)=>{
 //@access Private/Admin
 
 const getTicketByUID = async(req,res,next)=>{
-    const uid = req.query.uid;
+    const uid = req.params.uid;
     const ticket = await Ticket.findOne({ticketUID:uid}).populate('user', 'vehicle');
     if(ticket){
         res.json({status:'success',msg:'Ticket found', data:ticket});

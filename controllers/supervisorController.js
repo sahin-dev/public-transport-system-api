@@ -24,16 +24,17 @@ const User = require('../models/userModel');
 //@access Private
   
   const getTickets = async(req,res,next)=>{
-    const {ticketID} = req.body;
-    //const user = req.user;
-    const tickets = await Ticket.find({checked:false});
-    if(tickets.length == 0){
+    //const {ticketID} = req.body;
+    const user = req.user;
+    const tickets = await Ticket.find({}).populate('vehicle');
+    const mapTickets = tickets.map((t)=>t.vehicle.supervisor === user._id);
+    if(mapTickets.length == 0){
         res.status(200);
         res.json({status:'success', msg:'No tickets found'});
         return;
     }
     res.status(200);
-    res.json({status:'success', msg:'Tickets fetched successfully', data:tickets})
+    res.json({status:'success', msg:'Tickets fetched successfully', count:mapTickets.length, data:mapTickets})
 
   }
 
@@ -128,6 +129,8 @@ const User = require('../models/userModel');
     res.json({status:'success', msg:'Vehicle found', data:vehicle});
 
   }
+
+  
   
 
   module.exports = {checkTicket, getTicketByUID,getTickets, getMyVehicle}

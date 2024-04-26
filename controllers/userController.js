@@ -277,7 +277,7 @@ const purchaseTicket = async(req,res,next)=>{
 //@access Public
 
   const confirmRequst = async(req,res,next)=>{
-    const req_id= req.query.reqid;
+    const req_id= req.params.reqid;
 
     const request = await Request.findById(req_id);
     if(!request){
