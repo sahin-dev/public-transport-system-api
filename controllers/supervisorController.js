@@ -89,6 +89,7 @@ const User = require('../models/userModel');
 
     try{
         const ticket = await Ticket.findById(ticket_id).populate('vehicle');
+        
         if(ticket.checked || ticket.invalid){
             throw new Error("Ticket is invalid");
         }
@@ -96,8 +97,9 @@ const User = require('../models/userModel');
         if(ticket.valid_till<=Date.now()){
             throw new Error("Ticket expird")
         }
-        if(ticket.vehicle.supervisor != req.user._id){
-          throw new Error("You are not authrized to check thc ticket");
+        
+        if(ticket.vehicle.supervisor.toString() != req.user._id.toString()){
+          throw new Error("You are not authrized to check the ticket");
         }
 
         ticket.checked = true;
