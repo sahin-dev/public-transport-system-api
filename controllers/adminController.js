@@ -33,7 +33,7 @@ const getRequestsByResolve = async(req,res,next)=>{
 }
 
 //@desc Get requests by type
-//@route GET api/admin/request/:type
+//@route GET api/admin/requests/:type
 //@access Private
 
 const getRequestsByType = async(req,res,next)=>{
