@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.route('/requests').get(protect, admin, getRequestsByResolve);
 router.route('/requests/:type').get(protect, admin, getRequestsByType);
-router.route('/request').put(protect, resolveRequest);
+router.route('/request').put(protect,admin, resolveRequest);
 router.route('/users').get(protect,admin, getAllUsers);
 router.route('/vehicles').get(protect,admin, getAllTransport).post(protect,admin,getAllTransportByStatus);
 router.route('/tickets').get(protect, admin, getTickets);

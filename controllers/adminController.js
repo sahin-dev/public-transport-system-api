@@ -74,7 +74,16 @@ const resolveRequest = async(req,res,next)=>{
         if(!request){
             throw new Error("Request not found!");
         }
-        if(request.type === process.env.VEHICLE_ADDITION_REQUEST){
+
+        if(request.type === WITHDRAW_REQUEST)
+        {
+            request.isResolved = true;
+            request.status = status;
+            await request.save();
+            res.json({status:'success', msg:'Request Resolved'});
+            return;
+        }
+        if(request.type === VEHICLE_ADDITION_REQUEST){
             const vehicle = await Vehicle.findOne({number: request.body.number});
             vehicle.status = 'active';
             await vehicle.save();
@@ -83,13 +92,13 @@ const resolveRequest = async(req,res,next)=>{
         request.status = status;
         await request.save();
         let text = `Your request is ${status}.\n Thank you`;
-        if(request.type === process.env.VEHICLE_ADDITION_REQUEST)
+        if(request.type === VEHICLE_ADDITION_REQUEST)
             text = `Your vehcile with BRTA number ${request.body.number} is ${status}.\n Thank you`;
         mailSender(request.user.email, `Request is ${status}`, text);
         res.json({status:'success', msg:'Request resolved'});
     }catch(err){
         res.status(400);
-        res.json({status:'success', msg:'Request not found'});
+        res.json({status:'failed', msg:'Request not found'});
     }
 }
 
